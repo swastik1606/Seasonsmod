@@ -42,15 +42,30 @@ public class SeasonEvents {
             lastKnownSeason = seasonAfter;
             ModNetwork.sendToAll(
                     serverLevel.getServer(),
-                    new SeasonSyncPacket(seasonAfter));
+                    new SeasonSyncPacket(seasonAfter)
+            );
+            
+            int color;
+            if (seasonAfter == Season.SPRING) color=0x00FF7F;
+            else if (seasonAfter == Season.SUMMER) color=0xFFD700;
+            else if (seasonAfter == Season.AUTMN) color=0xFF6600;
+            else color=0x00BFFF;
+            
             serverLevel.players().forEach(player -> {
                 player.sendSystemMessage(
-                        Component.literal("The season has change to " + seasonAfter.getDisplayName() + "!"));
+                    Component.literal("► ")
+                        .append(Component.literal(seasonAfter.getDisplayName()+ " has arrived!")
+                        .withStyle(style -> style.withColor(color).withBold(true)))
+                );
             });
+
+            if (seasonAfter == Season.SPRING) {
+                meltIceNearPlayers(serverLevel);
+            }
         }
 
         tickCounter++;
-        if (tickCounter >= 200) {
+        if (tickCounter >= 20) {
             tickCounter = 0;
             SeasonsMod.LOGGER.info("Tick fired, season is: ", data.getCurrentSeason());
             applySeasonEffects(serverLevel, data.getCurrentSeason());
@@ -80,16 +95,30 @@ public class SeasonEvents {
             for (int x = -20; x <= 20; x++) {
                 for (int z = -20; z <= 20; z++) {
                     BlockPos pos = center.offset(x, 0, z);
-                    for (int y = -5; y <= 5; y++) {
-                        BlockPos checkPos = pos.offset(0, y, 0);
-                        BlockState state = level.getBlockState(checkPos);
-                        if (state.getBlock() == Blocks.WATER) {
-                            SeasonsMod.LOGGER.info("Found water at: " + checkPos);
-                            if (level.canSeeSky(checkPos)) {
-                                level.setBlock(checkPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
-                            }
+                    BlockPos surface=level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos
+                    ).below();
+                    BlockState state=level.getBlockState(surface);
+                    if(state.getBlock() == Blocks.WATER) {
+                        level.setBlock(surface, Blocks.PACKED_ICE.defaultBlockState(), 3);
+                    }
+                }
+            }
+        });
+    }
 
-                        }
+    private static void meltIceNearPlayers(ServerLevel level){
+        level.players().forEach(player -> {
+            BlockPos center = player.blockPosition();
+            for (int x=-20; x<=20; x++) {
+                for(int z=-20; z<=20; z++) {
+                    BlockPos pos=center.offset(x,0,z);
+                    BlockPos surface=level.getHeightmapPos(
+                        net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                        pos
+                    ).below();
+                    BlockState state=level.getBlockState(surface);
+                    if (state.getBlock() == Blocks.PACKED_ICE) {
+                        level.setBlock(surface, Blocks.WATER.defaultBlockState(), 3);
                     }
                 }
             }
@@ -98,14 +127,34 @@ public class SeasonEvents {
 
     @SubscribeEvent
     public static void onCropGrow(BlockEvent.CropGrowEvent.Pre event) {
-        if (!(event.getLevel() instanceof ServerLevel serverLevel))
-            return;
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
 
         SeasonSavedData data = SeasonSavedData.get(serverLevel);
         Season season = data.getCurrentSeason();
 
         if (season == Season.WINTER) {
             event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+            return;
+        }
+
+        if (season == Season.AUTMN) {
+            if (serverLevel.random.nextFloat() < 0.6f) {
+                event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+            }
+            return;
+        }
+
+        if (season == Season.SUMMER) {
+            if (serverLevel.random.nextFloat() < 0.5f) {
+                net.minecraft.world.level.block.Block block=event.getState().getBlock();
+                if( block instanceof CropBlock crop) {
+                    net.minecraft.world.level.block.state.BlockState current=event.getState();
+                    net.minecraft.world.level.block.state.BlockState grown= crop.getStateForAge(
+                        Math.min(crop.getAge(current) + 1, crop.getMaxAge())
+                    );
+                    serverLevel.setBlock(event.getPos(), grown, 3);
+                }
+            }
         }
     }
 
