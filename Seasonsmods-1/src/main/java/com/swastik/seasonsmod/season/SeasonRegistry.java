@@ -1,4 +1,4 @@
-package main.java.com.swastik.seasonsmod.season;
+package com.swastik.seasonsmod.season;
 
 public class SeasonRegistry {
     private static Season clientSeason= Season.SPRING;

@@ -1,7 +1,7 @@
-package main.java.com.swastik.seasonsmod.season;
+package com.swastik.seasonsmod.season;
 
 public enum Season {
-    SPRIN("Spring"),
+    SPRING("Spring"),
     SUMMER("Summer"),
     AUTMN("Autumn"),
     WINTER("winter");

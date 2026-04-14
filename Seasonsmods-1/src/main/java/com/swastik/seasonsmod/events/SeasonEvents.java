@@ -1,38 +1,71 @@
-package main.java.com.swastik.seasonsmod.events;
+package com.swastik.seasonsmod.events;
 
+import com.swastik.seasonsmod.network.ModNetwork;
+import com.swastik.seasonsmod.network.SeasonSyncPacket;
 import com.swastik.seasonsmod.season.Season;
-import com.swastik.seasonsmod.seasons.SeasonSavedData;
+import com.swastik.seasonsmod.season.SeasonSavedData;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.wolrd.level.block.Block;
-import net.minecraft.wolrd.level.block.Blocks;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.swastik.seasonmod.SeaaonsMod;
+import com.swastik.seasonsmod.SeasonsMod;
 
-@Mod.EventBusSubscriber(modid = SeasonsMod.MOD_ID, bus = Mod.EventBusSUbscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = SeasonsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class SeasonEvents {
+
     private static int tickCounter = 0;
+    private static Season lastKnownSeason=null;
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.LevelTickEvent event) {
-        if (event.phase != TicektEvent.Phase.END)
-            if (!(event.level instanceof ServerLevel serverLevel))
-                return;
-        if (!serverLevel.dimension().equals(ServerLevel.OVERWORLD))
-            return;
+        if (event.phase != TickEvent.Phase.END) return;
+        if (!(event.level instanceof ServerLevel serverLevel)) return;
+        if (!serverLevel.dimension().equals(ServerLevel.OVERWORLD))return;
 
         SeasonSavedData data = SeasonSavedData.get(serverLevel);
+        Season seasonBefore=data.getCurrentSeason();
         data.tick();
+        Season seasonAfter=data.getCurrentSeason();
+
+        if (seasonBefore != seasonAfter) {
+            lastKnownSeason=seasonAfter;
+            ModNetwork.sendToAll(
+                serverLevel.getServer(),
+                new SeasonSyncPacket(seasonAfter)
+            );
+            serverLevel.players().forEach(player -> {
+                player.sendSystemMessage(
+                    Component.literal("The season has change to " + seasonAfter.getDisplayName() + "!")
+                );
+            });
+        }
 
         tickCounter++;
         if (tickCounter >= 200) {
             tickCounter = 0;
             applySeasonEffects(serverLevel, data.getCurrentSeason());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        ServerLevel level= (ServerLevel) player.level();
+        SeasonSavedData data= SeasonSavedData.get(level);
+        ModNetwork.sendToPlayer(player, new SeasonSyncPacket(data.getCurrentSeason()));
+    }
+
+    private static void applySeasonEffects(ServerLevel level, Season season) {
+        if (season==Season.WINTER) {
+            freezeWaterNearPlayers(level);
         }
     }
 
@@ -47,10 +80,9 @@ public class SeasonEvents {
                         BlockState state = level.getBlockState(checkPos);
                         if (state.getBlock() == Blocks.WATER) {
                             if (level.canSeeSky(checkPos)) {
-                                if (level.canSeeSky(checkPos)) {
-                                    level.setBlock(checkPos, Blocks.ICE.defaultBlockState(), 3);
-                                }
+                                level.setBlock(checkPos, Blocks.ICE.defaultBlockState(), 3);
                             }
+                            
                         }
                     }
                 }
@@ -67,7 +99,7 @@ public class SeasonEvents {
         Season season = data.getCurrentSeason();
 
         if (season == Season.WINTER) {
-            event.setResult(net.minecraft.forge.eventbus.api.Event.Result.DENY);
+            event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
         }
     }
 

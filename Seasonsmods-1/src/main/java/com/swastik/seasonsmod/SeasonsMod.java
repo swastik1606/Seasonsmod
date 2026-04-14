@@ -1,12 +1,13 @@
-package main.java.com.swastik.seasonsmod;
+package com.swastik.seasonsmod;
 
+import com.swastik.seasonsmod.network.ModNetwork;
 import com.swastik.seasonsmod.season.SeasonRegistry;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraft.forge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifescycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.loggin.log4j.LogManager;
-import org.apache.loggin.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod("seasonsmod")
 public class SeasonsMod {
@@ -20,8 +21,9 @@ public class SeasonsMod {
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private voide setup(final FMLCommonSetupEvent event) {
+    private void setup(final FMLCommonSetupEvent event) {
         LOGGER.info("Seasons Mod initializing...");
-        main.java.com.swastik.seasonsmod.season.SeasonRegistry.init();
+        SeasonRegistry.init();
+        ModNetwork.register();
     }
 }

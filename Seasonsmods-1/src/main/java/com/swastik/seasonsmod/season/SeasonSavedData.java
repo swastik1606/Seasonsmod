@@ -1,4 +1,4 @@
-package main.java.com.swastik.seasonsmod.season;
+package com.swastik.seasonsmod.season;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -10,20 +10,20 @@ public class SeasonSavedData extends SavedData {
     private static final int SEASON_LENGTH = 24000*7;
     
     private Season currentSeason=Season.SPRING;
-    private int dayTImer=0;
+    private int dayTimer=0;
 
     public SeasonSavedData() {}
 
-    public static SeasonsSavedData get(ServerLevel level) {
-        return level.getDataStroage().computerIfAbsent(
+    public static SeasonSavedData get(ServerLevel level) {
+        return level.getDataStorage().computeIfAbsent(
             SeasonSavedData::load,
             SeasonSavedData::new,
             DATA_NAME
         );
     }
 
-    public static SeasonSavedDataload(CompoundTag tag) {
-    SeasonSavedData data=new SeasonsSavedData();
+    public static SeasonSavedData load(CompoundTag tag) {
+    SeasonSavedData data=new SeasonSavedData();
     data.currentSeason=Season.values()[tag.getInt("season")];
     data.dayTimer=tag.getInt("dayTimer");
     return data;
@@ -43,6 +43,17 @@ public class SeasonSavedData extends SavedData {
    public int getDayTimer() {
     return dayTimer;
    }
+
+   public void tick() {
+        dayTimer++;
+        if (dayTimer >= SEASON_LENGTH) {
+            dayTimer =0;
+             int nextIndex= (currentSeason.ordinal() +1) % Season.values().length;
+             currentSeason= Season.values()[nextIndex];
+        }
+
+        setDirty();
+    }
 
 }
 
