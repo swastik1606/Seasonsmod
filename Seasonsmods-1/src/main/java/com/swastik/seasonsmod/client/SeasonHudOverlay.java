@@ -9,7 +9,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.swastik.seasonsmod.SeasonsMod;
 
-@Mod.EventBusSubscriber(modid=SeasonsMod.MOD_ID, bus=Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid=SeasonsMod.MOD_ID, bus=Mod.EventBusSubscriber.Bus.FORGE, value=net.minecraftforge.api.distmarker.Dist.CLIENT)
 public class SeasonHudOverlay {
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiOverlayEvent.Post event) {

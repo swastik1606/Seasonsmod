@@ -22,54 +22,59 @@ import com.swastik.seasonsmod.SeasonsMod;
 public class SeasonEvents {
 
     private static int tickCounter = 0;
-    private static Season lastKnownSeason=null;
+    private static Season lastKnownSeason = null;
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.LevelTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        if (!(event.level instanceof ServerLevel serverLevel)) return;
-        if (!serverLevel.dimension().equals(ServerLevel.OVERWORLD))return;
+        if (event.phase != TickEvent.Phase.END)
+            return;
+        if (!(event.level instanceof ServerLevel serverLevel))
+            return;
+        if (!serverLevel.dimension().equals(ServerLevel.OVERWORLD))
+            return;
 
         SeasonSavedData data = SeasonSavedData.get(serverLevel);
-        Season seasonBefore=data.getCurrentSeason();
-        data.tick();
-        Season seasonAfter=data.getCurrentSeason();
+        Season seasonBefore = data.getCurrentSeason();
+        data.tick(serverLevel);
+        Season seasonAfter = data.getCurrentSeason();
 
         if (seasonBefore != seasonAfter) {
-            lastKnownSeason=seasonAfter;
+            lastKnownSeason = seasonAfter;
             ModNetwork.sendToAll(
-                serverLevel.getServer(),
-                new SeasonSyncPacket(seasonAfter)
-            );
+                    serverLevel.getServer(),
+                    new SeasonSyncPacket(seasonAfter));
             serverLevel.players().forEach(player -> {
                 player.sendSystemMessage(
-                    Component.literal("The season has change to " + seasonAfter.getDisplayName() + "!")
-                );
+                        Component.literal("The season has change to " + seasonAfter.getDisplayName() + "!"));
             });
         }
 
         tickCounter++;
         if (tickCounter >= 200) {
             tickCounter = 0;
+            SeasonsMod.LOGGER.info("Tick fired, season is: ", data.getCurrentSeason());
             applySeasonEffects(serverLevel, data.getCurrentSeason());
+
         }
     }
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) return;
-        ServerLevel level= (ServerLevel) player.level();
-        SeasonSavedData data= SeasonSavedData.get(level);
+        if (!(event.getEntity() instanceof ServerPlayer player))
+            return;
+        ServerLevel level = (ServerLevel) player.level();
+        SeasonSavedData data = SeasonSavedData.get(level);
         ModNetwork.sendToPlayer(player, new SeasonSyncPacket(data.getCurrentSeason()));
     }
 
     private static void applySeasonEffects(ServerLevel level, Season season) {
-        if (season==Season.WINTER) {
+        if (season == Season.WINTER) {
             freezeWaterNearPlayers(level);
         }
     }
 
     private static void freezeWaterNearPlayers(ServerLevel level) {
+        SeasonsMod.LOGGER.info("Freeze method running, players: " + level.players().size());
         level.players().forEach(player -> {
             BlockPos center = player.blockPosition();
             for (int x = -20; x <= 20; x++) {
@@ -79,10 +84,11 @@ public class SeasonEvents {
                         BlockPos checkPos = pos.offset(0, y, 0);
                         BlockState state = level.getBlockState(checkPos);
                         if (state.getBlock() == Blocks.WATER) {
+                            SeasonsMod.LOGGER.info("Found water at: " + checkPos);
                             if (level.canSeeSky(checkPos)) {
-                                level.setBlock(checkPos, Blocks.ICE.defaultBlockState(), 3);
+                                level.setBlock(checkPos, Blocks.PACKED_ICE.defaultBlockState(), 3);
                             }
-                            
+
                         }
                     }
                 }

@@ -7,55 +7,48 @@ import net.minecraft.world.level.saveddata.SavedData;
 public class SeasonSavedData extends SavedData {
 
     private static final String DATA_NAME = "seasonmod_season";
-    private static final int SEASON_LENGTH = 24000*7;
-    
-    private Season currentSeason=Season.SPRING;
-    private int dayTimer=0;
 
-    public SeasonSavedData() {}
+    private Season currentSeason = Season.SPRING;
+
+    public SeasonSavedData() {
+    }
 
     public static SeasonSavedData get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(
-            SeasonSavedData::load,
-            SeasonSavedData::new,
-            DATA_NAME
-        );
+                SeasonSavedData::load,
+                SeasonSavedData::new,
+                DATA_NAME);
     }
 
     public static SeasonSavedData load(CompoundTag tag) {
-    SeasonSavedData data=new SeasonSavedData();
-    data.currentSeason=Season.values()[tag.getInt("season")];
-    data.dayTimer=tag.getInt("dayTimer");
-    return data;
+        SeasonSavedData data = new SeasonSavedData();
+        data.currentSeason = Season.values()[tag.getInt("season")];
+        return data;
     }
 
     @Override
     public CompoundTag save(CompoundTag tag) {
-    tag.putInt("season", currentSeason.ordinal());
-    tag.putInt("dayTimer", dayTimer);
-    return tag;
-   }
+        tag.putInt("season", currentSeason.ordinal());
+        return tag;
+    }
 
-   public Season getCurrentSeason(){
-    return currentSeason;
-   }
+    public Season getCurrentSeason() {
+        return currentSeason;
+    }
 
-   public int getDayTimer() {
-    return dayTimer;
-   }
+    public void tick(ServerLevel level) {
+        long vanillaTime=level.getDayTime();
 
-   public void tick() {
-        dayTimer++;
-        if (dayTimer >= SEASON_LENGTH) {
-            dayTimer =0;
-             int nextIndex= (currentSeason.ordinal() +1) % Season.values().length;
-             currentSeason= Season.values()[nextIndex];
+        int totalDaysPassed = (int) (vanillaTime/24000);
+        int expectedSeasonIndex= (totalDaysPassed/7) % Season.values().length;
+        Season expectedSeason=Season.values()[expectedSeasonIndex];
+        
+        if (this.currentSeason!=expectedSeason) {
+            this.currentSeason=expectedSeason;
+            this.setDirty();
         }
 
         setDirty();
     }
 
 }
-
-
-
