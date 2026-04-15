@@ -23,7 +23,11 @@ public class SeasonsConfig {
 
         FREEZE_WATER=builder
             .comment("Wether water freezes during Winter (default true)")
-            .define("showHud", true);
+            .define("freezeWater", true);
+
+        SHOW_HUD=builder
+            .comment("Wether the season HUD should be visible (default true)")
+            .define("ShowHUD", true);
         
         builder.pop();
         SPEC=builder.build();
@@ -34,6 +38,9 @@ public class SeasonsConfig {
     }
 
     public static int getSeasonLengthTicks() {
-        return SEASON_LENGTH_DAYS.get() *24000;
+       if(!SPEC.isLoaded()) {
+        return 7*24000;
+       }
+       return SEASON_LENGTH_DAYS.get() *24000;
     }
 }

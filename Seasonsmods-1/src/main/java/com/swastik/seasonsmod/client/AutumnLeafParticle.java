@@ -26,8 +26,12 @@ public class AutumnLeafParticle extends TextureSheetParticle {
         this.xd=xSpeed;
         this.yd=ySpeed;
         this.zd=zSpeed;
-        this.quadSize=0.12f+random.nextFloat() * 0.08f;
+
+        this.quadSize=0.05f+random.nextFloat() * 0.04f;
+
         this.roll=random.nextFloat() * (float) Math.PI*2;
+
+        this.alpha=1.0f;
     }
 
     @Override
@@ -37,12 +41,19 @@ public class AutumnLeafParticle extends TextureSheetParticle {
         this.zo=this.z;
         this.xd+=windX;
         this.zd+=windZ;
-        this.xd+=0.96;
-        this.zd=0.96;
+
+        this.xd*=0.96;
+        this.zd*=0.96;
+
         this.yd-=gravity*0.04;
         this.oRoll=this.roll;
         this.roll+=0.08;
         this.move(this.xd,this.yd,this.zd);
+
+        if (this.age >= this.lifetime - 20) {
+            this.alpha=Math.max(0.0f, (float)(this.lifetime-this.age)/20.0f);
+        }
+
         if (this.age++ >= this.lifetime) {
             this.remove();
         }
