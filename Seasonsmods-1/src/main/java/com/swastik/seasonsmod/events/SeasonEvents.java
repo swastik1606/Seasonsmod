@@ -17,6 +17,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.swastik.seasonsmod.SeasonsMod;
+import com.swastik.seasonsmod.common.SeasonsConfig;
 
 @Mod.EventBusSubscriber(modid = SeasonsMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class SeasonEvents {
@@ -83,7 +84,7 @@ public class SeasonEvents {
     }
 
     private static void applySeasonEffects(ServerLevel level, Season season) {
-        if (season == Season.WINTER) {
+        if (season == Season.WINTER && SeasonsConfig.FREEZE_WATER.get()) {
             freezeWaterNearPlayers(level);
         }
     }

@@ -8,6 +8,7 @@ import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.swastik.seasonsmod.SeasonsMod;
+import com.swastik.seasonsmod.common.SeasonsConfig;
 
 @Mod.EventBusSubscriber(modid=SeasonsMod.MOD_ID, bus=Mod.EventBusSubscriber.Bus.FORGE, value=net.minecraftforge.api.distmarker.Dist.CLIENT)
 public class SeasonHudOverlay {
@@ -16,6 +17,7 @@ public class SeasonHudOverlay {
         Minecraft mc= Minecraft.getInstance();
         if (mc.player==null) return;
         if (mc.options.hideGui) return;
+        if (!SeasonsConfig.SHOW_HUD.get()) return;
 
         String seasonText="Season: " + SeasonRegistry.getClientSeason().getDisplayName();
         GuiGraphics graphics = event.getGuiGraphics();

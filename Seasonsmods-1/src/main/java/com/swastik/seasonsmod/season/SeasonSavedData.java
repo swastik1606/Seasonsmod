@@ -3,6 +3,7 @@ package com.swastik.seasonsmod.season;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+import com.swastik.seasonsmod.common.SeasonsConfig;
 
 public class SeasonSavedData extends SavedData {
 
@@ -39,16 +40,15 @@ public class SeasonSavedData extends SavedData {
     public void tick(ServerLevel level) {
         long vanillaTime=level.getDayTime();
 
+        int seasonLengthDays=SeasonsConfig.SEASON_LENGTH_DAYS.get();
         int totalDaysPassed = (int) (vanillaTime/24000);
-        int expectedSeasonIndex= (totalDaysPassed/7) % Season.values().length;
+        int expectedSeasonIndex= (totalDaysPassed/ seasonLengthDays) % Season.values().length;
         Season expectedSeason=Season.values()[expectedSeasonIndex];
-        
+
         if (this.currentSeason!=expectedSeason) {
             this.currentSeason=expectedSeason;
             this.setDirty();
         }
-
-        setDirty();
     }
 
 }
