@@ -62,11 +62,12 @@ public class SeasonEvents {
 
             if (seasonAfter == Season.SPRING) {
                 meltIceNearPlayers(serverLevel);
+                meltSnowNearPlayers(serverLevel);
             }
         }
 
         tickCounter++;
-        if (tickCounter >= 20) {
+        if (tickCounter >= 30) {
             tickCounter = 0;
             SeasonsMod.LOGGER.info("Tick fired, season is: ", data.getCurrentSeason());
             applySeasonEffects(serverLevel, data.getCurrentSeason());
@@ -86,6 +87,7 @@ public class SeasonEvents {
     private static void applySeasonEffects(ServerLevel level, Season season) {
         if (season == Season.WINTER && SeasonsConfig.FREEZE_WATER.get()) {
             freezeWaterNearPlayers(level);
+            placeSnowNearPlayers(level);
         }
     }
 
@@ -107,6 +109,32 @@ public class SeasonEvents {
         });
     }
 
+    private static void placeSnowNearPlayers(ServerLevel level) {
+        level.players().forEach(player -> {
+            BlockPos center = player.blockPosition();
+            for (int x=-30; x<=30; x++) {
+                for (int z=-30; z <=30; z++) {
+                    if (level.random.nextFloat()>0.3f) continue;
+                    BlockPos surface = level.getHeightmapPos(
+                        net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                        center.offset(x,0,z)
+                    );
+                    BlockPos below=surface.below();
+                    BlockState belowState=level.getBlockState(below);
+                    BlockState surfaceState=level.getBlockState(surface);
+
+                    if (!surfaceState.isAir()) continue;
+                    if (!level.canSeeSky(surface)) continue;
+
+                    BlockState snowState = net.minecraft.world.level.block.Blocks.SNOW.defaultBlockState();
+                    if (snowState.canSurvive(level, surface)) {
+                        level.setBlock(surface, snowState, 3);
+                    }
+                }
+            }
+        });
+    }
+
     private static void meltIceNearPlayers(ServerLevel level){
         level.players().forEach(player -> {
             BlockPos center = player.blockPosition();
@@ -120,6 +148,24 @@ public class SeasonEvents {
                     BlockState state=level.getBlockState(surface);
                     if (state.getBlock() == Blocks.PACKED_ICE) {
                         level.setBlock(surface, Blocks.WATER.defaultBlockState(), 3);
+                    }
+                }
+            }
+        });
+    }
+
+    private static void meltSnowNearPlayers(ServerLevel level) {
+        level.players().forEach(player ->{
+            BlockPos center=player.blockPosition();
+            for (int x=-30; x<=30; x++) {
+                for (int z=-30; z<=30; z++) {
+                    BlockPos surface=level.getHeightmapPos(
+                        net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                        center.offset(x,0,z));
+
+                    BlockState state=level.getBlockState(surface);
+                    if (state.getBlock() == Blocks.SNOW) {
+                        level.setBlock(surface, Blocks.AIR.defaultBlockState(), 3);
                     }
                 }
             }
