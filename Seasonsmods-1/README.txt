@@ -65,6 +65,13 @@ saves/<worldname>/serverconfig/seasonsmod-common.toml
 
 Here you can change things like the length of seasons, wether the water should freeze or not and the visibility of the HUD.
 
+## Installation
+ 
+1. Install [Minecraft Forge 1.20.1](https://files.minecraftforge.net)
+2. Download the latest `.jar` from the [Releases](../../releases) page
+3. Drop it into your `.minecraft/mods/` folder
+4. Launch Minecraft with the Forge 1.20.1 profile
+
 ---
 
 **Requirements:**
