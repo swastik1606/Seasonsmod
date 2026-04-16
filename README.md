@@ -104,6 +104,12 @@ Requires Java 17 and an internet connection on first build to download Minecraft
 
 ---
 
+## License
+ 
+MIT License — free to use, modify, and distribute with credit.
+ 
+---
+
 ## Credits
 
 Built from scratch using Minecraft Forge MDK 1.20.1.
