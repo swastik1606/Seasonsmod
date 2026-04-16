@@ -67,7 +67,7 @@ public class SeasonEvents {
         }
 
         tickCounter++;
-        if (tickCounter >= 30) {
+        if (tickCounter >= 10) {
             tickCounter = 0;
             SeasonsMod.LOGGER.info("Tick fired, season is: ", data.getCurrentSeason());
             applySeasonEffects(serverLevel, data.getCurrentSeason());
@@ -95,8 +95,8 @@ public class SeasonEvents {
         SeasonsMod.LOGGER.info("Freeze method running, players: " + level.players().size());
         level.players().forEach(player -> {
             BlockPos center = player.blockPosition();
-            for (int x = -20; x <= 20; x++) {
-                for (int z = -20; z <= 20; z++) {
+            for (int x = -60; x <= 60; x++) {
+                for (int z = -60; z <= 60; z++) {
                     BlockPos pos = center.offset(x, 0, z);
                     BlockPos surface=level.getHeightmapPos(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, pos
                     ).below();
@@ -112,8 +112,8 @@ public class SeasonEvents {
     private static void placeSnowNearPlayers(ServerLevel level) {
         level.players().forEach(player -> {
             BlockPos center = player.blockPosition();
-            for (int x=-30; x<=30; x++) {
-                for (int z=-30; z <=30; z++) {
+            for (int x=-60; x<=60; x++) {
+                for (int z=-60; z <=60; z++) {
                     if (level.random.nextFloat()>0.3f) continue;
                     BlockPos surface = level.getHeightmapPos(
                         net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -138,8 +138,8 @@ public class SeasonEvents {
     private static void meltIceNearPlayers(ServerLevel level){
         level.players().forEach(player -> {
             BlockPos center = player.blockPosition();
-            for (int x=-20; x<=20; x++) {
-                for(int z=-20; z<=20; z++) {
+            for (int x=-60; x<=60; x++) {
+                for(int z=-60; z<=60; z++) {
                     BlockPos pos=center.offset(x,0,z);
                     BlockPos surface=level.getHeightmapPos(
                         net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -157,8 +157,8 @@ public class SeasonEvents {
     private static void meltSnowNearPlayers(ServerLevel level) {
         level.players().forEach(player ->{
             BlockPos center=player.blockPosition();
-            for (int x=-30; x<=30; x++) {
-                for (int z=-30; z<=30; z++) {
+            for (int x=-60; x<=60; x++) {
+                for (int z=-60; z<=60; z++) {
                     BlockPos surface=level.getHeightmapPos(
                         net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                         center.offset(x,0,z));
