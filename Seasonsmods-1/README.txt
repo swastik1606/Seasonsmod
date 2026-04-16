@@ -1,46 +1,101 @@
+# Seasons and Weather Overhaul
+### A Minecraft Forge Mod for 1.20.1
 
-Source installation information for modders
--------------------------------------------
-This code follows the Minecraft Forge installation methodology. It will apply
-some small patches to the vanilla MCP source code, giving you and it access 
-to some of the data and functions you need to build a successful mod.
+> Four seasons. Real effects. Every world feels alive.
 
-Note also that the patches are built against "un-renamed" MCP source code (aka
-SRG Names) - this means that you will not be able to read them directly against
-normal code.
+---
 
-Setup Process:
-==============================
+## Overview
 
-Step 1: Open your command-line and browse to the folder where you extracted the zip file.
+**Seasons and Weather Overhaul** adds a full four-season cycle to Minecraft that actually affects how you play. Crops behave differently, water freezes, snow blankets the ground, the sky shifts in color, and particles drift through the air - all tied directly to in-game time.
 
-Step 2: You're left with a choice.
-If you prefer to use Eclipse:
-1. Run the following command: `./gradlew genEclipseRuns`
-2. Open Eclipse, Import > Existing Gradle Project > Select Folder 
-   or run `gradlew eclipse` to generate the project.
+---
 
-If you prefer to use IntelliJ:
-1. Open IDEA, and import project.
-2. Select your build.gradle file and have it import.
-3. Run the following command: `./gradlew genIntellijRuns`
-4. Refresh the Gradle Project in IDEA if required.
+## Features
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can 
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-(this does not affect your code) and then start the process again.
+### 🌸 Spring
+- Cherry blossoms drift through the air
+- Ice and snow from Winter melt away
+- Crops return to normal growth speed
+- Sky takes on a soft green tint
 
-Mapping Names:
-=============================
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license, if you do not agree with it you can change your mapping names to other crowdsourced names in your 
-build.gradle. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
+### ☀️ Summer
+- Crops grow faster than usual
+- Sky brightens with a warm blue hue
+- The world is at its most lush
 
-Additional Resources: 
-=========================
-Community Documentation: https://docs.minecraftforge.net/en/1.20.1/gettingstarted/
-LexManos' Install Video: https://youtu.be/8VEdtQLuLO0
-Forge Forums: https://forums.minecraftforge.net/
-Forge Discord: https://discord.minecraftforge.net/
+### 🍂 Autumn
+- Custom Orange and red leaves drift down around you
+- Leaf blocks on all trees change color - oak, birch, jungle, acacia, dark oak
+- Crops slow down significantly
+- Sky warms to an amber tint
+
+### ❄️ Winter
+- Snow layers accumulate on the ground around you as you move
+- Water surfaces freeze to packed ice
+- Crops stop growing entirely
+- Snowflakes fall in the open air
+- Sky shifts to a cold blue tone
+
+---
+
+## Season Transitions
+
+When a season changes you'll see a colored announcement in chat:
+
+- **Spring has arrived!**
+- **Summer has arrived!**
+- **Autumn has arrived!**
+- **Winter has arrived!**
+
+---
+
+## HUD
+
+The current season is displayed in the top-left corner of your screen at all times. Can be toggled off in the config.
+
+---
+
+## Configuration
+
+After loading the mod once, a config file is generated at:
+```
+saves/<worldname>/serverconfig/seasonsmod-common.toml
+```
+
+Here you can change things like the length of seasons, wether the water should freeze or not and the visibility of the HUD.
+
+---
+
+**Requirements:**
+- Minecraft 1.20.1
+- Forge 47.x
+- Java 17
+
+---
+
+## Compatibility
+
+- Works in both singleplayer and multiplayer
+- Season state is saved per world and persists across sessions
+- In multiplayer, the season is synced from server to all connected clients automatically
+
+---
+
+## Building from Source
+
+```bash
+git clone https://github.com/swastik1606/SeasonsMod
+cd SeasonsMod
+gradlew build
+```
+
+Output `.jar` will be in `build/libs/`.
+
+Requires Java 17 and an internet connection on first build to download Minecraft dependencies.
+
+---
+
+## Credits
+
+Built from scratch using Minecraft Forge MDK 1.20.1.
