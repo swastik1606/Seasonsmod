@@ -50,7 +50,8 @@ public class SeasonLeafColors {
             Blocks.BIRCH_LEAVES,
             Blocks.JUNGLE_LEAVES,
             Blocks.ACACIA_LEAVES,
-            Blocks.DARK_OAK_LEAVES
+            Blocks.DARK_OAK_LEAVES,
+            Blocks.SPRUCE_LEAVES
         );
     }
 }

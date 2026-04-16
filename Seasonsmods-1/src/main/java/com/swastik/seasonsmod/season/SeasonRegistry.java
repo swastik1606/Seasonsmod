@@ -25,7 +25,7 @@ public class SeasonRegistry {
     private static int transitionTick=0;
     private static int transitionRadius=0;
     private static final int MAX_RADIUS=128;
-    private static final int TICKS_PER_STEP=4;
+    private static final int TICKS_PER_STEP=2;
 
     public static void init() {
     }
@@ -81,7 +81,7 @@ public class SeasonRegistry {
             (center.getZ() -r) >> 4
         );
 
-        transitionRadius +=8;
+        transitionRadius +=16;
         if (transitionRadius>MAX_RADIUS) {
             transitionPending = false;
             transitionRadius = 0;
